@@ -1,0 +1,7 @@
+{
+  "name": "rmind",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
