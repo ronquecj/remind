@@ -8,155 +8,41 @@ import {
   IonToast,
   IonModal,
   IonInput,
-} from '@ionic/react';
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import {
   IonAccordion,
   IonAccordionGroup,
-  IonItem,
-  IonLabel,
 } from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonItem, IonLabel } from '@ionic/react';
 import { useRef } from 'react';
 import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
-import { trashBinOutline } from 'ionicons/icons';
-import { add } from 'ionicons/icons';
+import { add, documentAttachSharp } from 'ionicons/icons';
 import axios from 'axios';
 import './Home.css';
+import {
+  RenderAccordionProps,
+  AddButtonProps,
+  Task,
+} from './AddProps';
 
 interface Props {
   days: any;
 }
 
-const Home: React.FC = () => {
-  let day = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
-
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>
-            <h1 className="app-name">
-              <span className="grey">RE</span>MIND
-            </h1>
-          </IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent fullscreen>
-        <h1 className="tasks">Tasks</h1>
-        <IonAccordionGroup expand="inset">
-          <IonAccordion value="first">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Monday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[0]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="second">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Tuesday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[1]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="third">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Wednesday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[2]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="fourth">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Thrusday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[3]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="fifth">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Friday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[4]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="sixth">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Saturday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[5]} />
-            </div>
-          </IonAccordion>
-
-          <IonAccordion value="seventh">
-            <IonItem className="accor" slot="header" color="light">
-              <IonLabel className="day">Sunday</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              <RenderAccordion days={day[6]} />
-            </div>
-          </IonAccordion>
-        </IonAccordionGroup>
-      </IonContent>
-      <AddButton />
-    </IonPage>
-  );
-};
-
-export default Home;
-
-function RenderAccordion(props: Props) {
-  const [data, setData] = useState<any[]>([]);
-  const [updatedData, setDoneButton] = useState<any[]>([]);
-  const [deleted, setDelete] = useState<any[]>([]);
-  const baseURL = 'http://remindapi.mygamesonline.org/api/';
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(`${baseURL}tasks`);
-        console.log(response.data.payload);
-        setData(response.data.payload);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+function RenderAccordion(props: RenderAccordionProps) {
+  const baseURL = 'http://localhost/remind/api/';
+  const mbaseURL = 'http://192.168.18.44:8100/remind/api/';
+  const [datas, setData] = useState<any[]>([]);
+  let { days, data } = props;
 
   const fetchD = async () => {
+    console.log(data)
     try {
       const response = await axios.post(`${baseURL}tasks`);
       console.log(response.data);
-      setData(response.data.payload);
+      setData(response.data.payload)
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
-
-  const conLog = (k: any) => {
-    console.log(`test: ${k}`);
   };
 
   const btnDone = async (p_id: any) => {
@@ -185,17 +71,17 @@ function RenderAccordion(props: Props) {
 
   return (
     <>
-      {data == null ? (
+      {datas == null ? (
         <p>No task available</p>
       ) : (
         <div>
-          {data.filter(
+          {datas.filter(
             (t) => t.fld_day.toLowerCase() == props.days.toLowerCase()
-          ).length == 0 ? (
+          ).length === 0 ? (
             <p>No task available.</p>
           ) : (
-            data
-              .filter((t) => t.fld_day == props.days)
+            datas
+              .filter((t) => t.fld_day === props.days)
               .map((item) => (
                 <div className="task" key={item.fld_id}>
                   <div className="top-part">
@@ -249,14 +135,126 @@ function RenderAccordion(props: Props) {
   );
 }
 
-function AddButton() {
+function Home() {
+  const [taskData, setTaskData] = useState<any[]>([]);
+  const baseURL = 'http://localhost/remind/api/';
+  const mbaseURL = 'http://192.168.18.44:8100/remind/api/';
+  const day = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.post(`${baseURL}tasks`);
+      console.log(response.data.payload);
+      setTaskData(response.data.payload);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>
+            <h1 className="app-name">
+              <span className="grey">RE</span>MIND
+            </h1>
+          </IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent fullscreen>
+        <h1 className="tasks">Tasks</h1>
+        <IonAccordionGroup expand="inset">
+          <IonAccordion value="first">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Monday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[0]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="second">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Tuesday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[1]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="third">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Wednesday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[2]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="fourth">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Thursday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[3]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="fifth">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Friday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[4]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="sixth">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Saturday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[5]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+
+          <IonAccordion value="seventh">
+            <IonItem className="accor" slot="header" color="light">
+              <IonLabel className="day">Sunday</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <RenderAccordion days={day[6]} data={taskData} />{' '}
+            </div>
+          </IonAccordion>
+        </IonAccordionGroup>
+      </IonContent>
+      <AddButton onTaskAdded={fetchData} />{' '}
+    </IonPage>
+  );
+}
+
+function AddButton({ onTaskAdded }: { onTaskAdded: () => void }) {
   const modal = useRef<HTMLIonModalElement>(null);
   const [sData, setD] = useState<any[]>([]);
   const [data, setData] = useState('');
   const [day, setDay] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  const baseURL = 'http://remindapi.mygamesonline.org/api/';
+  const baseURL = 'http://localhost/remind/api/';
+  const mbaseURL = 'http://192.168.18.44:8100/remind/api/';
 
   const createTask = async (p_day: any, p_title: any) => {
     try {
@@ -272,7 +270,8 @@ function AddButton() {
     }
     dismiss();
     setIsOpen(true);
-    history.go(0);
+    setIsOpen(true);
+    onTaskAdded();
   };
 
   function dismiss() {
@@ -343,3 +342,5 @@ function AddButton() {
     </>
   );
 }
+
+export default Home;
